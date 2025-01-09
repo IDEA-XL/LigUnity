@@ -84,39 +84,6 @@ done
 python ensemble_result_fewshot.py FEP_fewshot support_num
 ```
 
-### Reproduce results on prospective study
-```
-# run few-shot fine-tuning
-path2weight="path to checkpoint of pocket_ranking"
-path2result="./result/pocket_ranking/TIME"
-support_num=8
-CUDA_VISIBLE_DEVICES=0 bash test.sh TIME pocket_ranking support_num ${path2weight} ${path2result}
-
-path2weight="path to checkpoint of protein_ranking"
-path2result="./result/protein_ranking/TIME"
-CUDA_VISIBLE_DEVICES=0 bash test.sh TIME protein_ranking support_num ${path2weight} ${path2result}
-
-
-# get final prediction of our model
-python ensemble_result_fewshot.py TIME support_num
-```
-
-### Reproduce results on unseen assay type
-```
-# run few-shot fine-tuning
-path2weight="path to checkpoint of pocket_ranking"
-path2result="./result/pocket_ranking/OOD"
-support_num=8
-CUDA_VISIBLE_DEVICES=0 bash test.sh OOD pocket_ranking support_num ${path2weight} ${path2result}
-
-path2weight="path to checkpoint of protein_ranking"
-path2result="./result/protein_ranking/OOD"
-CUDA_VISIBLE_DEVICES=0 bash test.sh OOD protein_ranking support_num ${path2weight} ${path2result}
-
-# get final prediction of our model
-python ensemble_result_fewshot.py OOD support_num
-```
-
 ### Reproduce results on active learning
 to speed up the active learning process, you should modify the unicore code 
 1. find the installed dir of unicore (root-to-unicore)
