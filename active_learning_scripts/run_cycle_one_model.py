@@ -47,7 +47,8 @@ def parse_arguments():
 
 
 def run_model(arch, weight_path, results_path, result_file, lr, master_port, train_ligf, test_ligf, device):
-    current_dir = "/cto_studio/xtalpi_lab/fengbin/DrugCLIP"
+    import os
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     cmd = [
         "bash", "./active_learning_scripts/run_model.sh",
         arch,
@@ -60,7 +61,7 @@ def run_model(arch, weight_path, results_path, result_file, lr, master_port, tra
         test_ligf,
         str(device)
     ]
-    subprocess.run(cmd, check=True, cwd=current_dir)
+    subprocess.run(cmd, check=True, cwd=project_root)
 
 
 def prepare_initial_split(input_file, results_dir, al_batch_size, repeat_idx, cycle_idx, base_seed):

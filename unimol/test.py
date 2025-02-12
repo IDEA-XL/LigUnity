@@ -82,8 +82,8 @@ def main(args):
 
         elif args.test_task == "ALL":
             task.test_fep(model)
+            task.test_dude(model)
             task.test_dekois(model)
-            task.inference_dude(model)
             task.test_pcba(model)
 
 

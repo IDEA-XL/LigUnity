@@ -7,7 +7,7 @@ results_path=${4}
 echo "writing to ${results_path}"
 
 mkdir -p $results_path
-python ./unimol/test.py "./vocab" --user-dir ./unimol --valid-subset test \
+python ./unimol/test.py "./test_datasets" --user-dir ./unimol --valid-subset test \
        --results-path $results_path \
        --num-workers 8 --ddp-backend=c10d --batch-size $batch_size \
        --task test_task --loss rank_softmax --arch $arch \

@@ -1,20 +1,20 @@
-data_path="./vocab"
+data_path="./test_datasets"
+
+TASK=${1}
+arch=${2}
+sup_num=${3}
+weight_path=${4}
+results_path=${5}
 
 n_gpu=1
 batch_size=8
 batch_size_valid=16
-epoch=20
+epoch=10
 update_freq=1
 lr=1e-4
 MASTER_PORT=10092
-arch=pocket_ranking
 export NCCL_ASYNC_ERROR_HANDLING=1
 export OMP_NUM_THREADS=1
-
-
-weight_path="./checkpoints/checkpoint_avg_41-50.pt"
-results_path="./results/FEP_fewshot"
-sup_num=16
 seed=1
 
 torchrun --nproc_per_node=$n_gpu --master_port=$MASTER_PORT $(which unicore-train) $data_path --user-dir ./unimol --train-subset train --valid-subset valid \
@@ -31,7 +31,7 @@ torchrun --nproc_per_node=$n_gpu --master_port=$MASTER_PORT $(which unicore-trai
         --no-save --save-dir $results_path --tmp-save-dir $results_path  \
         --find-unused-parameters \
         --maximize-best-checkpoint-metric \
-        --split-method random --valid-set FEP \
+        --split-method random --valid-set $TASK \
         --max-lignum 512 \
         --sup-num $sup_num \
         --restore-model $weight_path --few-shot true \

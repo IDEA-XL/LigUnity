@@ -99,7 +99,7 @@ def scaffold_split(smi_list, num_sup, seed=1):
         idx_list_all += idx_list
 
     return idx_list_all
-
+    
 
 def is_older(_version):
     if isinstance(_version, int):
@@ -318,10 +318,10 @@ class pocketscreen(UnicoreTask):
         return dataset
 
     def load_few_shot_TYK2_FEP_dataset(self, split, **kwargs):
-        save_path = f"{PROJECT_ROOT}/test_datasets/FEP"
-        ligands_lmdb = os.path.join(f"{PROJECT_ROOT}/test_datasets/case_study/tyk2_fep_ligands.lmdb")
-        pocket_lmdb = os.path.join(f"{PROJECT_ROOT}/test_datasets/FEP/proteins.lmdb")
-        pair_label_all = json.load(open(f"{PROJECT_ROOT}/test_datasets/case_study/tyk2_fep.json"))
+        save_path = f"{self.args.data}/FEP"
+        ligands_lmdb = os.path.join(f"{self.args.data}/case_study/tyk2_fep_ligands.lmdb")
+        pocket_lmdb = os.path.join(f"{self.args.data}/FEP/proteins.lmdb")
+        pair_label_all = json.load(open(f"{self.args.data}/case_study/tyk2_fep.json"))
         pair_label_all = [pair_label_all]
         import pandas as pd
 
@@ -342,7 +342,7 @@ class pocketscreen(UnicoreTask):
             pair_label["ligands"] = sorted(pair_label["ligands"], key=lambda x: x["act"], reverse=True)
 
         print("average activity of tyk2:", np.mean(act_all))
-        print("moving the average into", avgact_train)
+        print("moving the average to be", avgact_train)
         for assay in pair_label_all:
             for lig in assay["ligands"]:
                 lig["act"] = (lig["act"] - np.mean(act_all))/np.std(act_all) + avgact_train
@@ -355,14 +355,14 @@ class pocketscreen(UnicoreTask):
         return dataset
 
     def load_few_shot_FEP_dataset(self, split, **kwargs):
-        save_path = f"{PROJECT_ROOT}/test_datasets/FEP"
-        ligands_lmdb = os.path.join(f"{save_path}/ligands.lmdb")
-        pocket_lmdb = os.path.join(f"{save_path}/proteins.lmdb")
-        pair_label_all = json.load(open(f"{save_path}/fep_labels.json"))
+        data_path = f"{self.args.data}/FEP"
+        ligands_lmdb = os.path.join(f"{data_path}/ligands.lmdb")
+        pocket_lmdb = os.path.join(f"{data_path}/proteins.lmdb")
+        pair_label_all = json.load(open(f"{data_path}/fep_labels.json"))
 
         for pair_label in pair_label_all:
             pair_label["assay_id"] = pair_label["uniprot"]
-            if self.args.sup_num <= 1:
+            if self.args.sup_num < 1:
                 k_shot = int(self.args.sup_num * len(pair_label["ligands"]))
             else:
                 k_shot = int(self.args.sup_num)
@@ -381,13 +381,14 @@ class pocketscreen(UnicoreTask):
         return dataset
 
     def load_few_shot_ood_dataset(self, split, **kwargs):
-        mol_data_path = os.path.join(self.args.data, "oodtest_unit=%_lig.lmdb")
-        pocket_data_path = os.path.join(self.args.data, "oodtest_unit=%_prot.lmdb")
-        assay_test_ood = json.load(open(os.path.join(self.args.data, "oodtest_unit=%.json")))
+        data_path = f"{self.args.data}/OOD"
+        mol_data_path = os.path.join(data_path, "oodtest_unit=%_lig.lmdb")
+        pocket_data_path = os.path.join(data_path, "oodtest_unit=%_prot.lmdb")
+        assay_test_ood = json.load(open(os.path.join(data_path, "oodtest_unit=%.json")))
         act_all = []
         avgact_train = 6.955628350893639
         for assay in assay_test_ood:
-            if self.args.sup_num <= 1:
+            if self.args.sup_num < 1:
                 k_shot = int(self.args.sup_num * len(assay["ligands"]))
             else:
                 k_shot = int(self.args.sup_num)
@@ -399,6 +400,8 @@ class pocketscreen(UnicoreTask):
             elif self.args.split_method == "scaffold":
                 smi_list = [x["smi"] for x in assay["ligands"]]
                 select_index = scaffold_split(smi_list, k_shot)
+            else:
+                raise ValueError(f"Invalid split method: {self.args.split_method}. Supported methods are 'random' and 'scaffold'")
 
             if split == "train":
                 assay["ligands"] = [assay["ligands"][idx] for idx in select_index[:k_shot]]
@@ -409,7 +412,7 @@ class pocketscreen(UnicoreTask):
             act_all += [x["act"] for x in assay["ligands"]]
 
         print("average activity of ood:", np.mean(act_all))
-        print("moving the average into", avgact_train)
+        print("moving the average to be", avgact_train)
         for assay in assay_test_ood:
             for lig in assay["ligands"]:
                 lig["act"] = lig["act"] - np.mean(act_all) + avgact_train
@@ -423,35 +426,13 @@ class pocketscreen(UnicoreTask):
 
 
     def load_few_shot_timesplit(self, split, **kwargs):
-        mol_data_path = os.path.join(self.args.data, "train_lig_all_blend.lmdb")
-        pocket_data_path = os.path.join(self.args.data, "train_prot_all_blend.lmdb")
-        assay_test = []
-        assay_train = []
-        label_train = json.load(open(os.path.join(self.args.data, "train_label_blend_seq_full.json")))
-        for assay in label_train:
-            if not is_older(assay["version"]):
-                ligand_lst = [ligand["smi"] for ligand in assay["ligands"]]
-                if len(ligand_lst) != len(set(ligand_lst)):
-                    continue
-                if len(ligand_lst) < 20:
-                    continue
-                pic50_std = np.array([ligand["act"] for ligand in assay["ligands"]])
-                if np.std(pic50_std) <= 0.4:
-                    continue
-                assay_test.append(assay)
-            else:
-                assay_train.append(assay)
-
-        print(len(assay_test))
-        test_uniprots = [assay["uniprot"] for assay in assay_test]
-        print(len(set(test_uniprots)), len(test_uniprots))
-        train_uniprots = [assay["uniprot"] for assay in assay_train]
-        print(len(set(train_uniprots)), len(train_uniprots))
-        unseen_prot = set(test_uniprots) - set(train_uniprots)
-        assay_test_unseen = [assay for assay in assay_test if assay["uniprot"] in unseen_prot]
-        print("assay_test_unseen", len(assay_test_unseen))
-        for assay in assay_test_unseen:
-            if self.args.sup_num <= 1:
+        mol_data_path = os.path.join(self.args.data, "test_lig_timesplit.lmdb")
+        pocket_data_path = os.path.join(self.args.data, "test_prot_timesplit.lmdb")
+        test_assays = json.load(open(os.path.join(self.args.data, "assay_test_timesplit.json")))
+        
+        print("number of test assays", len(test_assays))
+        for assay in test_assays:
+            if self.args.sup_num < 1:
                 k_shot = int(self.args.sup_num * len(assay["ligands"]))
             else:
                 k_shot = int(self.args.sup_num)
@@ -463,6 +444,8 @@ class pocketscreen(UnicoreTask):
             elif self.args.split_method == "scaffold":
                 smi_list = [x["smi"] for x in assay["ligands"]]
                 select_index = scaffold_split(smi_list, k_shot, self.args.seed)
+            else:
+                raise ValueError(f"Invalid split method: {self.args.split_method}. Supported methods are 'random' and 'scaffold'")
 
             if split == "train":
                 assay["ligands"] = [assay["ligands"][idx] for idx in select_index[:k_shot]]
@@ -500,11 +483,11 @@ class pocketscreen(UnicoreTask):
         protein_clstr_dict = {}
         if self.args.protein_similarity_thres == 0.4:
             protein_clstr_dict_40 = read_cluster_file(
-                f"{PROJECT_ROOT}/test_datasets/uniport40.clstr")
+                f"{self.args.data}/uniport40.clstr")
             protein_clstr_dict = protein_clstr_dict_40
         elif self.args.protein_similarity_thres == 0.8:
             protein_clstr_dict_80 = read_cluster_file(
-                f"{PROJECT_ROOT}/test_datasets/uniport80.clstr")
+                f"{self.args.data}/uniport80.clstr")
             protein_clstr_dict = protein_clstr_dict_80
 
         if split == "train" or (split == "valid" and self.args.valid_set == "TIME"):
@@ -554,7 +537,7 @@ class pocketscreen(UnicoreTask):
                 pair_label_2 = [x for x in pair_label_2 if (x["assay_id"] not in non_repeat_assayids)]
                 print("number of assays after remove assays in FEP:", len(pair_label_2))
 
-                testset_uniport_root = f"{PROJECT_ROOT}/test_datasets"
+                testset_uniport_root = f"{self.args.data}"
                 if self.args.valid_set == "CASF":
                     # remove all testset protein by default
                     testset_uniprot_lst = []
@@ -614,7 +597,7 @@ class pocketscreen(UnicoreTask):
             pair_dataset = PairDataset(self.args, pocket_dataset, mol_dataset, pair_label, split, use_cache=False)
         elif split == "valid" and self.args.valid_set == "FEP":
             # fep valid
-            save_path = f"{PROJECT_ROOT}/test_datasets/FEP"
+            save_path = f"{self.args.data}/FEP"
             mol_data_path = os.path.join(f"{save_path}/ligands.lmdb")
             pocket_data_path = os.path.join(f"{save_path}/proteins.lmdb")
             pair_label = json.load(open(f"{save_path}/fep_labels.json"))

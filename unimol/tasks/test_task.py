@@ -36,7 +36,6 @@ logger = logging.getLogger(__name__)
 import os
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-testset_uniport_root = f"{PROJECT_ROOT}/test_datasets/testset_uniport_ids"
 
 
 def re_new(y_true, y_score, ratio):
@@ -205,7 +204,7 @@ class ContrasRankTest(UnicoreTask):
             split (str): name of the data scoure (e.g., bppp)
         """
         if split == "test":
-            data_path = f"{PROJECT_ROOT}/test_datasets/casf.lmdb"
+            data_path = f"{self.args.data}/casf.lmdb"
         else:
             data_path = os.path.join(self.args.data, split + ".lmdb")
         dataset = LMDBDataset(data_path)
@@ -562,7 +561,7 @@ class ContrasRankTest(UnicoreTask):
         """Encode a dataset with the molecule encoder."""
 
         # names = "PPARG"
-        data_path = f"{PROJECT_ROOT}/test_dataset/lit_pcba/" + name + "/mols.lmdb"
+        data_path = f"{self.args.data}/lit_pcba/" + name + "/mols.lmdb"
         mol_dataset = self.load_mols_dataset(data_path, "atoms", "coordinates")
         num_data = len(mol_dataset)
         bsz = self.args.batch_size
@@ -585,7 +584,7 @@ class ContrasRankTest(UnicoreTask):
         mol_reps = np.concatenate(mol_reps, axis=0)
         labels = np.array(labels, dtype=np.int32)
         # generate pocket data
-        data_path = f"{PROJECT_ROOT}/test_dataset/lit_pcba/" + name + "/pockets.lmdb"
+        data_path = f"{self.args.data}/lit_pcba/" + name + "/pockets.lmdb"
         pocket_dataset = self.load_pockets_dataset(data_path)
         pocket_data = torch.utils.data.DataLoader(pocket_dataset, batch_size=bsz, collate_fn=pocket_dataset.collater)
         pocket_reps = []
@@ -616,7 +615,7 @@ class ContrasRankTest(UnicoreTask):
         """Encode a dataset with the molecule encoder."""
 
         # names = "PPARG"
-        data_path = f"{PROJECT_ROOT}/test_dataset/lit_pcba/" + name + "/mols.lmdb"
+        data_path = f"{self.args.data}/lit_pcba/" + name + "/mols.lmdb"
         mol_dataset = self.load_mols_dataset(data_path, "atoms", "coordinates")
         num_data = len(mol_dataset)
         bsz = self.args.batch_size
@@ -635,7 +634,7 @@ class ContrasRankTest(UnicoreTask):
             labels.extend(mol_sample["target"].detach().cpu().numpy())
 
             # generate pocket data
-            data_path = f"{PROJECT_ROOT}/test_dataset/lit_pcba/" + name + "/pockets.lmdb"
+            data_path = f"{self.args.data}/lit_pcba/" + name + "/pockets.lmdb"
             pocket_dataset = self.load_pockets_dataset(data_path)
             pocket_data = torch.utils.data.DataLoader(pocket_dataset, batch_size=bsz,
                                                       collate_fn=pocket_dataset.collater)
@@ -665,7 +664,7 @@ class ContrasRankTest(UnicoreTask):
         return auc, bedroc, ef_list, re_list
 
     def test_pcba(self, model, **kwargs):
-        targets = os.listdir(f"{PROJECT_ROOT}/test_dataset/lit_pcba/")
+        targets = os.listdir(f"{self.args.data}/lit_pcba/")
 
         # print(targets)
         auc_list = []
@@ -684,7 +683,7 @@ class ContrasRankTest(UnicoreTask):
             "0.02": [],
             "0.05": []
         }
-        uniprot_list = json.load(open(f"{testset_uniport_root}/PCBA.json"))
+        uniprot_list = json.load(open(f"{self.args.data}/PCBA.json"))
         target2uniport = {x[2]: x[0] for x in uniprot_list}
 
         for target in targets:
@@ -731,7 +730,7 @@ class ContrasRankTest(UnicoreTask):
 
     def test_dude_target(self, target, model, seq, **kwargs):
 
-        data_path = f"{PROJECT_ROOT}/test_dataset/DUD-E/" + target + "/mols_real.lmdb"
+        data_path = f"{self.args.data}/DUD-E/" + target + "/mols_real.lmdb"
         mol_dataset = self.load_mols_dataset(data_path, "atoms", "coordinates")
         num_data = len(mol_dataset)
         bsz = 64
@@ -757,7 +756,7 @@ class ContrasRankTest(UnicoreTask):
         mol_reps = np.concatenate(mol_reps, axis=0)
         labels = np.array(labels, dtype=np.int32)
         # generate pocket data
-        data_path = f"{PROJECT_ROOT}/test_dataset/DUD-E/" + target + "/pocket.lmdb"
+        data_path = f"{self.args.data}/DUD-E/" + target + "/pocket.lmdb"
         pocket_dataset = self.load_pockets_dataset(data_path)
         pocket_data = torch.utils.data.DataLoader(pocket_dataset, batch_size=bsz, collate_fn=pocket_dataset.collater)
         pocket_reps = []
@@ -779,15 +778,13 @@ class ContrasRankTest(UnicoreTask):
         auc, bedroc, ef_list, re_list = cal_metrics(labels, res_single, 80.5)
 
         print(target)
-
-        print(np.sum(labels), len(labels) - np.sum(labels))
-        print(ef_list)
+        print("ef:", ef_list)
 
         return auc, bedroc, ef_list, re_list, res_single, labels
 
     def test_dude_target_regression(self, target, model, seq, **kwargs):
 
-        data_path = f"{PROJECT_ROOT}/test_dataset/DUD-E/" + target + "/mols_real.lmdb"
+        data_path = f"{self.args.data}/DUD-E/" + target + "/mols_real.lmdb"
         mol_dataset = self.load_mols_dataset(data_path, "atoms", "coordinates")
         num_data = len(mol_dataset)
         bsz = 64
@@ -813,7 +810,7 @@ class ContrasRankTest(UnicoreTask):
             labels.extend(mol_sample["target"].detach().cpu().numpy())
 
             # generate pocket data
-            data_path = f"{PROJECT_ROOT}/test_dataset/DUD-E/" + target + "/pocket.lmdb"
+            data_path = f"{self.args.data}/DUD-E/" + target + "/pocket.lmdb"
             pocket_dataset = self.load_pockets_dataset(data_path)
             pocket_data = torch.utils.data.DataLoader(pocket_dataset, batch_size=bsz,
                                                       collate_fn=pocket_dataset.collater)
@@ -838,15 +835,13 @@ class ContrasRankTest(UnicoreTask):
         auc, bedroc, ef_list, re_list = cal_metrics(labels, res_single, 80.5)
 
         print(target)
-
-        print(np.sum(labels), len(labels) - np.sum(labels))
-        print(ef_list)
+        print("ef:", ef_list)
 
         return auc, bedroc, ef_list, re_list, res_single, labels
 
     def test_dude(self, model, **kwargs):
 
-        targets = list(os.listdir(f"{PROJECT_ROOT}/test_dataset/DUD-E/"))
+        targets = list(os.listdir(f"{self.args.data}/DUD-E/"))
         auc_list = []
         bedroc_list = []
         ef_list = []
@@ -865,7 +860,7 @@ class ContrasRankTest(UnicoreTask):
             "0.05": [],
         }
         targets.reverse()
-        uniprot_list = json.load(open(f"{testset_uniport_root}/dude.json"))
+        uniprot_list = json.load(open(f"{self.args.data}/dude.json"))
         target2uniport = {x[2]: x[0] for x in uniprot_list}
 
         for i, target in enumerate(targets):
@@ -894,7 +889,7 @@ class ContrasRankTest(UnicoreTask):
 
     def test_dekois_target(self, target, model, seq, **kwargs):
 
-        data_path = f"{PROJECT_ROOT}/test_datasets/DEKOIS_2.0x/{target}/{target}_lig.lmdb"
+        data_path = f"{self.args.data}/DEKOIS_2.0x/{target}/{target}_lig.lmdb"
         mol_dataset = self.load_mols_dataset(data_path, "atoms", "coordinates")
         num_data = len(mol_dataset)
         bsz = 64
@@ -920,7 +915,7 @@ class ContrasRankTest(UnicoreTask):
         mol_reps = np.concatenate(mol_reps, axis=0)
         labels = np.array(labels, dtype=np.int32)
         # generate pocket data
-        data_path = f"{PROJECT_ROOT}/test_datasets/DEKOIS_2.0x/{target}/{target}_pocket.lmdb"
+        data_path = f"{self.args.data}/DEKOIS_2.0x/{target}/{target}_pocket.lmdb"
         pocket_dataset = self.load_pockets_dataset(data_path)
         pocket_data = torch.utils.data.DataLoader(pocket_dataset, batch_size=bsz, collate_fn=pocket_dataset.collater)
         pocket_reps = []
@@ -943,15 +938,13 @@ class ContrasRankTest(UnicoreTask):
         auc, bedroc, ef_list, re_list = cal_metrics(labels, res_single, 80.5)
 
         print(target)
-
-        print(np.sum(labels), len(labels) - np.sum(labels))
-        print(ef_list)
+        print("ef:", ef_list)
 
         return auc, bedroc, ef_list, re_list, res_single, labels
 
     def test_dekois_target_regression(self, target, model, seq, **kwargs):
 
-        data_path = f"{PROJECT_ROOT}/test_datasets/DEKOIS_2.0x/{target}/{target}_lig.lmdb"
+        data_path = f"{self.args.data}/DEKOIS_2.0x/{target}/{target}_lig.lmdb"
         mol_dataset = self.load_mols_dataset(data_path, "atoms", "coordinates")
         num_data = len(mol_dataset)
         bsz = 64
@@ -972,7 +965,7 @@ class ContrasRankTest(UnicoreTask):
             labels.extend(mol_sample["target"].detach().cpu().numpy())
 
             # generate pocket data
-            data_path = f"{PROJECT_ROOT}/test_datasets/DEKOIS_2.0x/{target}/{target}_pocket.lmdb"
+            data_path = f"{self.args.data}/DEKOIS_2.0x/{target}/{target}_pocket.lmdb"
             pocket_dataset = self.load_pockets_dataset(data_path)
             pocket_data = torch.utils.data.DataLoader(pocket_dataset, batch_size=bsz,
                                                       collate_fn=pocket_dataset.collater)
@@ -999,15 +992,13 @@ class ContrasRankTest(UnicoreTask):
         auc, bedroc, ef_list, re_list = cal_metrics(labels, res_single, 80.5)
 
         print(target)
-
-        print(np.sum(labels), len(labels) - np.sum(labels))
-        print(ef_list)
+        print("ef:", ef_list)
 
         return auc, bedroc, ef_list, re_list, res_single, labels
 
     def test_dekois(self, model, **kwargs):
 
-        targets = list(os.listdir(f"{PROJECT_ROOT}/test_datasets/DEKOIS_2.0x/"))
+        targets = list(os.listdir(f"{self.args.data}/DEKOIS_2.0x/"))
         auc_list = []
         bedroc_list = []
         ef_list = []
@@ -1027,11 +1018,11 @@ class ContrasRankTest(UnicoreTask):
         }
         targets.reverse()
 
-        uniprot_list = json.load(open(f"{testset_uniport_root}/dekois.json"))
+        uniprot_list = json.load(open(f"{self.args.data}/dekois.json"))
         target2uniport = {x[2]: x[0] for x in uniprot_list}
 
         for i, target in enumerate(targets):
-            if not os.path.exists(f"{PROJECT_ROOT}/test_datasets/DEKOIS_2.0x/{target}/{target}_lig.lmdb"):
+            if not os.path.exists(f"{self.args.data}/DEKOIS_2.0x/{target}/{target}_lig.lmdb"):
                 continue
             seq = get_uniprot_seq(target2uniport[target.upper()])
             if self.args.arch in ["DTA", "pocketregression"]:
@@ -1093,7 +1084,7 @@ class ContrasRankTest(UnicoreTask):
         np.save(f"{self.args.results_path}/saved_target_embed.npy", pocket_reps)
 
     def test_fep_target(self, target, model, label_info, **kwargs):
-        data_path = f"/content/ContrasRank/test_datasets/FEP/{target}_lig.lmdb"
+        data_path = f"{self.args.data}/FEP/lmdbs/{target}_lig.lmdb"
         mol_dataset = self.load_mols_dataset(data_path, "atoms", "coordinates")
         num_data = len(mol_dataset)
         bsz = 64
@@ -1113,7 +1104,7 @@ class ContrasRankTest(UnicoreTask):
             mol_smis.extend(sample["smi_name"])
         mol_reps = np.concatenate(mol_reps, axis=0)
         # generate pocket data
-        data_path = f"/content/ContrasRank/test_datasets/FEP/{target}.lmdb"
+        data_path = f"{self.args.data}/FEP/lmdbs/{target}.lmdb"
         pocket_dataset = self.load_pockets_dataset(data_path)
         pocket_data = torch.utils.data.DataLoader(pocket_dataset, batch_size=bsz, collate_fn=pocket_dataset.collater)
         pocket_reps = []
@@ -1150,7 +1141,7 @@ class ContrasRankTest(UnicoreTask):
 
     def test_fep_target_regression(self, target, model, label_info, **kwargs):
 
-        data_path = f"/content/ContrasRank/test_datasets/FEP/{target}_lig.lmdb"
+        data_path = f"{self.args.data}/FEP/lmdbs/{target}_lig.lmdb"
         mol_dataset = self.load_mols_dataset(data_path, "atoms", "coordinates")
         num_data = len(mol_dataset)
         bsz = 64
@@ -1166,7 +1157,7 @@ class ContrasRankTest(UnicoreTask):
             labels.extend(mol_sample["target"].detach().cpu().numpy())
 
             # generate pocket data
-            data_path = f"/content/ContrasRank/test_datasets/FEP/{target}.lmdb"
+            data_path = f"{self.args.data}/FEP/lmdbs/{target}.lmdb"
             pocket_dataset = self.load_pockets_dataset(data_path)
             pocket_data = torch.utils.data.DataLoader(pocket_dataset, batch_size=bsz,
                                                       collate_fn=pocket_dataset.collater)
@@ -1209,12 +1200,10 @@ class ContrasRankTest(UnicoreTask):
 
     def test_fep(self, model, **kwargs):
         labels_fep = json.load(
-            open("/content/ContrasRank/test_datasets/FEP/fep_labels.json"))
-        ligands_dict = {x["uniprot"]: x for x in labels_fep}
+            open(f"{self.args.data}/FEP/fep_labels.json"))
+        ligands_dict = {x["pockets"][0]: x for x in labels_fep}
         rho_list = []
         for i, target in enumerate(ligands_dict.keys()):
-            if target == "cdk8gen":
-                continue
             if self.args.arch in ["DTA", "pocketregression"]:
                 rho = self.test_fep_target_regression(target, model, ligands_dict[target])
             else:
@@ -1237,7 +1226,7 @@ class ContrasRankTest(UnicoreTask):
         if split == "train":
             pdbbind_label = json.load(open(f"{self.args.data}/train_label_pdbbind_seq.json"))
         else:
-            pdbbind_label = json.load(open(f"{PROJECT_ROOT}/test_datasets/casf_label_seq.json"))
+            pdbbind_label = json.load(open(f"/casf_label_seq.json"))
         for assay in pdbbind_label:
             seq = assay["sequence"]
             pockets = assay["pockets"]

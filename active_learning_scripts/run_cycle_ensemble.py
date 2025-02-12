@@ -54,8 +54,9 @@ def parse_arguments():
 
 
 def _run(cmd):
-    current_dir = "/cto_studio/xtalpi_lab/fengbin/DrugCLIP"
-    subprocess.run(cmd, check=True, cwd=current_dir)
+    import os
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    subprocess.run(cmd, check=True, cwd=project_root)
 
 
 def run_model(arch_1, arch_2, weight_path_1, weight_path_2, results_path_1, results_path_2, result_file, lr,
@@ -256,6 +257,8 @@ def update_splits(results_dir_1, results_dir_2, predictions_1, predictions_2,
 
     return (new_train_file_1, new_test_file_1,
             new_train_file_2, new_test_file_2)
+
+
 def run_active_learning(args):
     # Create base results directories
     os.system(f"rm -rf {args.results_dir_1}")

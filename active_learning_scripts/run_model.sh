@@ -1,4 +1,4 @@
-data_path="/cto_studio/xtalpi_lab/fengbin/datas/biolip/dataset_pocketscreen"
+data_path="./test_datasets"
 
 n_gpu=1
 
