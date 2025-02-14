@@ -7,15 +7,16 @@ epoch=20
 update_freq=1
 lr=1e-4
 MASTER_PORT=10092
-arch=pocket_ranking
+
 export NCCL_ASYNC_ERROR_HANDLING=1
 export OMP_NUM_THREADS=1
 
-weight_path=${1}
-results_path=${2}
-lig_file=${3}
-prot_file=${4}
-split_file=${5}
+arch=${1}
+weight_path=${2}
+results_path=${3}
+lig_file=${4}
+prot_file=${5}
+split_file=${6}
 
 sup_num=16
 seed=1
