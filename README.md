@@ -13,7 +13,7 @@ Colab demo for few-shot fine-tuning with given protein, few measure ligands for 
 
 https://colab.research.google.com/drive/1gf0HhgyqI4qBjUAUICCvDa-FnTaARmR_?usp=sharing
 
-
+Please feel free to contact me by email if there is any problem with the code or paper: fengbin@idea.edu.cn.
 
 ## Abstract
 
