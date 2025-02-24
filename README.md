@@ -73,11 +73,11 @@ for r in {1..6} do
     path2weight="path to checkpoint of pocket_ranking"
     path2result="./result/pocket_ranking/FEP_fewshot/repeat_{r}"
     support_num=0.6
-    CUDA_VISIBLE_DEVICES=0 bash test.sh FEP pocket_ranking support_num ${path2weight} ${path2result}
+    CUDA_VISIBLE_DEVICES=0 bash test_fewshot.sh FEP pocket_ranking support_num ${path2weight} ${path2result}
     
     path2weight="path to checkpoint of protein_ranking"
     path2result="./result/protein_ranking/FEP_fewshot/repeat_{r}"
-    CUDA_VISIBLE_DEVICES=0 bash test.sh FEP protein_ranking support_num ${path2weight} ${path2result}
+    CUDA_VISIBLE_DEVICES=0 bash test_fewshot.sh FEP protein_ranking support_num ${path2weight} ${path2result}
 done
 
 # get final prediction of our model
