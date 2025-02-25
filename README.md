@@ -27,9 +27,10 @@ We demonstrate the effectiveness and versatility of LigUnity on eight benchmarks
 
 ### Reproduce results on virtual screening benchmarks
 
-Please first download the processed datased before running
+Please first download checkpoints and processed dataset before running
 - Download our procesed Dekois 2.0 dataset from https://doi.org/10.6084/m9.figshare.27967422
 - Download LIT-PCBA and DUD-E datasets from https://drive.google.com/drive/folders/1zW1MGpgunynFxTKXC2Q4RgWxZmg6CInV?usp=sharing
+- Clone model checkpoint from https://huggingface.co/fengb/LigUnity_VS (test proteins in DUD-E, Dekois, and LIT-PCBA are removed from the training set)
 
 ```
 # run pocket/protein and ligand encoder model
@@ -50,6 +51,10 @@ python ensemble_result.py DUDE PCBA DEKOIS
 
 
 ### Reproduce results on FEP benchmarks (zero-shot)
+
+Please first download checkpoints before running
+- Clone model checkpoint from https://huggingface.co/fengb/LigUnity_pocket_ranking and https://huggingface.co/fengb/LigUnity_protein_ranking (test ligands and assays in FEP benchmarks are removed from the training set)
+
 ```
 # run pocket/protein and ligand encoder model
 for r in {1..6} do
@@ -68,6 +73,7 @@ python ensemble_result.py FEP
 
 ### Reproduce results on FEP benchmarks (few-shot)
 ```
+# use the same checkpoints as in zero-shot
 # run few-shot fine-tuning
 for r in {1..6} do
     path2weight="path to checkpoint of pocket_ranking"
@@ -118,6 +124,7 @@ python -c "import unicore; print('/'.join(unicore.__file__.split('/')[:-2]))"
 
 4. run the active learning procedure
 ```
+# use the same checkpoints as in FEP experiments
 path1="path to checkpoint of pocket_ranking"
 path2="path to checkpoint of protein_ranking"
 result1="./result/pocket_ranking/TYK2"
