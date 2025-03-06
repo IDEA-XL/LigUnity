@@ -136,13 +136,13 @@ bash ./active_learning_scripts/run_al.sh 5 0 path1 path2 result1 result2
 ## Citation
 
 ```
-@Article{feng2025foundation,
-title={A foundation model for protein-ligand affinity prediction through jointly optimizing virtual screening and hit-to-lead optimization},
-author={Feng, Bin and Liu, Zijing and Yang, Mingjun and Zou, Junjie and Cao, He and Li, Yu and Zhang, Lei and Wang, Sheng},
-journal={bioRxiv},
-pages={2025--02},
-year={2025},
-publisher={Cold Spring Harbor Laboratory}
+@article{feng2025foundation,
+  title={A foundation model for protein-ligand affinity prediction through jointly optimizing virtual screening and hit-to-lead optimization},
+  author={Feng, Bin and Liu, Zijing and Yang, Mingjun and Zou, Junjie and Cao, He and Li, Yu and Zhang, Lei and Wang, Sheng},
+  journal={bioRxiv},
+  pages={2025--02},
+  year={2025},
+  publisher={Cold Spring Harbor Laboratory}
 }
 
 @article{feng2024bioactivity,
