@@ -133,6 +133,29 @@ result2="./result/protein_ranking/TYK2"
 # run active learning cycle for 5 iters with pure greedy strategy
 bash ./active_learning_scripts/run_al.sh 5 0 path1 path2 result1 result2
 ```
+## Citation
+
+```
+@Article{feng2025foundation,
+title={A foundation model for protein-ligand affinity prediction through jointly optimizing virtual screening and hit-to-lead optimization},
+author={Feng, Bin and Liu, Zijing and Yang, Mingjun and Zou, Junjie and Cao, He and Li, Yu and Zhang, Lei and Wang, Sheng},
+journal={bioRxiv},
+pages={2025--02},
+year={2025},
+publisher={Cold Spring Harbor Laboratory}
+}
+
+@article{feng2024bioactivity,
+  title={A bioactivity foundation model using pairwise meta-learning},
+  author={Feng, Bin and Liu, Zequn and Huang, Nanlan and Xiao, Zhiping and Zhang, Haomiao and Mirzoyan, Srbuhi and Xu, Hanwen and Hao, Jiaran and Xu, Yinghui and Zhang, Ming and others},
+  journal={Nature Machine Intelligence},
+  volume={6},
+  number={8},
+  pages={962--974},
+  year={2024},
+  publisher={Nature Publishing Group UK London}
+}
+```
 
 ## Acknowledgments 
 
