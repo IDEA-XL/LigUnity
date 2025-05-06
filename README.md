@@ -31,19 +31,20 @@ Please first download checkpoints and processed dataset before running
 - Download our procesed Dekois 2.0 dataset from https://doi.org/10.6084/m9.figshare.27967422
 - Download LIT-PCBA and DUD-E datasets from https://drive.google.com/drive/folders/1zW1MGpgunynFxTKXC2Q4RgWxZmg6CInV?usp=sharing
 - Clone model checkpoint from https://huggingface.co/fengb/LigUnity_VS (test proteins in DUD-E, Dekois, and LIT-PCBA are removed from the training set)
+- Clone dataset from https://figshare.com/articles/dataset/LigUnity_project_data/27966819 and unzip them all (you can ignore .lmdb file if you only want to reproduce test result).
 
 ```
 # run pocket/protein and ligand encoder model
-path2weight="path to checkpoint of pocket_ranking"
-path2result="./result/pocket_ranking"
-CUDA_VISIBLE_DEVICES=0 bash test.sh ALL pocket_ranking ${path2weight} ${path2result}
+path2weight="absolute path to the checkpoint of pocket_ranking"
+CUDA_VISIBLE_DEVICES=0 bash test.sh ALL pocket_ranking ${path2weight} "./result/pocket_ranking"
 
-path2weight="path to checkpoint of protein_ranking"
-path2result="./result/protein_ranking"
-CUDA_VISIBLE_DEVICES=0 bash test.sh ALL protein_ranking ${path2weight} ${path2result}
+path2weight="absolute path to the checkpoint of protein_ranking"
+CUDA_VISIBLE_DEVICES=0 bash test.sh ALL protein_ranking ${path2weight} "./result/protein_ranking"
 
-# run H-GNN model
-# coming soon
+# train H-GNN model
+cd ./HGNN
+python main.py --data_root ${path2data} --result_root "../result/pocket_ranking"
+python main.py --data_root ${path2data} --result_root "../result/protein_ranking"
 
 # get final prediction of our model
 python ensemble_result.py DUDE PCBA DEKOIS
