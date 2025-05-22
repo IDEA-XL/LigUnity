@@ -580,7 +580,7 @@ class pocketscreen(UnicoreTask):
                     print("number of deleted pdbbind after remove test uniport", old_len - len(pair_label_1))
 
             print(f"totally {len(pair_label_2)} datas (blend ChEMBL and BindingDB) for {split}")
-            pair_label = []
+            pair_label = pair_label_2
             if split == "train":
                 pair_label += pair_label_1
             pair_dataset = PairDataset(self.args, pocket_dataset, mol_dataset, pair_label, split=split, use_cache=True, cache_dir=self.args.data)
