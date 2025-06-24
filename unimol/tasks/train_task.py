@@ -318,10 +318,11 @@ class pocketscreen(UnicoreTask):
         return dataset
 
     def load_few_shot_TYK2_FEP_dataset(self, split, **kwargs):
-        save_path = f"{self.args.data}/FEP"
-        ligands_lmdb = os.path.join(f"{self.args.data}/case_study/tyk2_fep_ligands.lmdb")
-        pocket_lmdb = os.path.join(f"{self.args.data}/FEP/proteins.lmdb")
-        pair_label_all = json.load(open(f"{self.args.data}/case_study/tyk2_fep.json"))
+        test_datasets_root = os.path.join(PROJECT_ROOT, "test_datasets")
+        save_path = f"{test_datasets_root}/FEP"
+        ligands_lmdb = os.path.join(f"{test_datasets_root}/case_study/tyk2_fep_ligands.lmdb")
+        pocket_lmdb = os.path.join(f"{test_datasets_root}/FEP/proteins.lmdb")
+        pair_label_all = json.load(open(f"{test_datasets_root}/case_study/tyk2_fep.json"))
         pair_label_all = [pair_label_all]
         import pandas as pd
 
@@ -355,7 +356,7 @@ class pocketscreen(UnicoreTask):
         return dataset
 
     def load_few_shot_FEP_dataset(self, split, **kwargs):
-        data_path = f"{self.args.data}/FEP"
+        data_path = os.path.join(PROJECT_ROOT, "test_datasets", "FEP")
         ligands_lmdb = os.path.join(f"{data_path}/ligands.lmdb")
         pocket_lmdb = os.path.join(f"{data_path}/proteins.lmdb")
         pair_label_all = json.load(open(f"{data_path}/fep_labels.json"))
@@ -381,7 +382,7 @@ class pocketscreen(UnicoreTask):
         return dataset
 
     def load_few_shot_ood_dataset(self, split, **kwargs):
-        data_path = f"{self.args.data}/OOD"
+        data_path = os.path.join(PROJECT_ROOT, "test_datasets", "OOD")
         mol_data_path = os.path.join(data_path, "oodtest_unit=%_lig.lmdb")
         pocket_data_path = os.path.join(data_path, "oodtest_unit=%_prot.lmdb")
         assay_test_ood = json.load(open(os.path.join(data_path, "oodtest_unit=%.json")))
@@ -426,9 +427,10 @@ class pocketscreen(UnicoreTask):
 
 
     def load_few_shot_timesplit(self, split, **kwargs):
-        mol_data_path = os.path.join(self.args.data, "test_lig_timesplit.lmdb")
-        pocket_data_path = os.path.join(self.args.data, "test_prot_timesplit.lmdb")
-        test_assays = json.load(open(os.path.join(self.args.data, "assay_test_timesplit.json")))
+        test_datasets_root = os.path.join(PROJECT_ROOT, "test_datasets")
+        mol_data_path = os.path.join(test_datasets_root, "TIME", "test_lig_timesplit.lmdb")
+        pocket_data_path = os.path.join(test_datasets_root, "TIME", "test_prot_timesplit.lmdb")
+        test_assays = json.load(open(os.path.join(test_datasets_root, "TIME", "assay_test_timesplit.json")))
         
         print("number of test assays", len(test_assays))
         for assay in test_assays:
@@ -497,6 +499,7 @@ class pocketscreen(UnicoreTask):
             pocket_dataset = self.load_pockets_dataset(pocket_data_path, is_train=split=="train")
             pair_label_1 = json.load(open(os.path.join(self.args.data, "train_label_pdbbind_seq.json")))
             pair_label_2 = json.load(open(os.path.join(self.args.data, "train_label_blend_seq_full.json")))
+            test_datasets_root = os.path.join(PROJECT_ROOT, "test_datasets")
             if self.args.valid_set == "TIME":
                 pair_label_2_new = []
                 for assay in pair_label_2:
@@ -511,9 +514,9 @@ class pocketscreen(UnicoreTask):
                             pair_label_2_new.append(assay)
                 pair_label_2 = pair_label_2_new
             else:
-                repeat_ligands = json.load(open(os.path.join(self.args.data, "fep_repeat_ligands_can.json")))
+                repeat_ligands = json.load(open(os.path.join(test_datasets_root, "fep_repeat_ligands_can.json")))
                 if "no_similar_ligand" in self.args.save_dir:
-                    sim_ligands_cache = os.path.join(self.args.data, "fep_similar_ligands_0d5.json")
+                    sim_ligands_cache = os.path.join(test_datasets_root, "fep_similar_ligands_0d5.json")
                     repeat_ligands += json.load(open(sim_ligands_cache))
 
                 pair_label_2_new = []
@@ -531,19 +534,18 @@ class pocketscreen(UnicoreTask):
                 pair_label_2 = pair_label_2_new
                 print("number of assays after remove ligands in FEP:", len(pair_label_2))
 
-                non_repeat_assayids = json.load(open(os.path.join(self.args.data, "fep_assays.json")))
+                non_repeat_assayids = json.load(open(os.path.join(test_datasets_root, "fep_assay_ids.json")))
                 non_repeat_assayids = set(non_repeat_assayids)
 
                 pair_label_2 = [x for x in pair_label_2 if (x["assay_id"] not in non_repeat_assayids)]
                 print("number of assays after remove assays in FEP:", len(pair_label_2))
 
-                testset_uniport_root = f"{self.args.data}"
                 if self.args.valid_set == "CASF":
                     # remove all testset protein by default
                     testset_uniprot_lst = []
-                    testset_uniprot_lst += [x[0] for x in json.load(open(f"{testset_uniport_root}/dude.json"))]
-                    testset_uniprot_lst += [x[0] for x in json.load(open(f"{testset_uniport_root}/PCBA.json"))]
-                    testset_uniprot_lst += [x[0] for x in json.load(open(f"{testset_uniport_root}/dekois.json"))]
+                    testset_uniprot_lst += [x[0] for x in json.load(open(f"{test_datasets_root}/dude.json"))]
+                    testset_uniprot_lst += [x[0] for x in json.load(open(f"{test_datasets_root}/PCBA.json"))]
+                    testset_uniprot_lst += [x[0] for x in json.load(open(f"{test_datasets_root}/dekois.json"))]
 
                     # remove all similar protein
                     if "no_similar_protein" in self.args.save_dir:
@@ -559,7 +561,7 @@ class pocketscreen(UnicoreTask):
 
                     # remove all similar protein
                     if "no_similar_protein" in self.args.save_dir:
-                        testset_uniprot_lst += [x[0] for x in json.load(open(f"{testset_uniport_root}/FEP.json"))]
+                        testset_uniprot_lst += [x[0] for x in json.load(open(f"{test_datasets_root}/FEP.json"))]
                         testset_uniprot_lst_new = []
                         for uniprot in testset_uniprot_lst:
                             testset_uniprot_lst_new += protein_clstr_dict.get(uniprot, [uniprot])
@@ -597,7 +599,7 @@ class pocketscreen(UnicoreTask):
             pair_dataset = PairDataset(self.args, pocket_dataset, mol_dataset, pair_label, split, use_cache=False)
         elif split == "valid" and self.args.valid_set == "FEP":
             # fep valid
-            save_path = f"{self.args.data}/FEP"
+            save_path = os.path.join(PROJECT_ROOT, "test_datasets", "FEP")
             mol_data_path = os.path.join(f"{save_path}/ligands.lmdb")
             pocket_data_path = os.path.join(f"{save_path}/proteins.lmdb")
             pair_label = json.load(open(f"{save_path}/fep_labels.json"))
