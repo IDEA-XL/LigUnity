@@ -42,9 +42,13 @@ Please first download checkpoints and processed dataset before running
 # run pocket/protein and ligand encoder model
 path2weight="absolute path to the checkpoint of pocket_ranking"
 CUDA_VISIBLE_DEVICES=0 bash test.sh ALL pocket_ranking ${path2weight} "./result/pocket_ranking"
+CUDA_VISIBLE_DEVICES=0 bash test.sh BDB pocket_ranking ${path2weight} "./result/pocket_ranking"
+CUDA_VISIBLE_DEVICES=0 bash test.sh PDB pocket_ranking ${path2weight} "./result/pocket_ranking"
 
 path2weight="absolute path to the checkpoint of protein_ranking"
 CUDA_VISIBLE_DEVICES=0 bash test.sh ALL protein_ranking ${path2weight} "./result/protein_ranking"
+CUDA_VISIBLE_DEVICES=0 bash test.sh BDB protein_ranking ${path2weight} "./result/protein_ranking"
+CUDA_VISIBLE_DEVICES=0 bash test.sh PDB protein_ranking ${path2weight} "./result/protein_ranking"
 
 # train H-GNN model
 cd ./HGNN
