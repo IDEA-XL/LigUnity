@@ -52,8 +52,10 @@ CUDA_VISIBLE_DEVICES=0 bash test.sh PDB protein_ranking ${path2weight} "./result
 
 # train H-GNN model
 cd ./HGNN
-python main.py --data_root ${path2data} --result_root "../result/pocket_ranking"
-python main.py --data_root ${path2data} --result_root "../result/protein_ranking"
+path2weight_HGNN="absolute path to the checkpoint of HGNN pocket"
+python main.py --data_root ${path2data} --result_root "../result/pocket_ranking" --test_ckpt ${path2weight_HGNN}
+path2weight_HGNN="absolute path to the checkpoint of HGNN protein"
+python main.py --data_root ${path2data} --result_root "../result/protein_ranking" --test_ckpt ${path2weight_HGNN}
 
 # get final prediction of our model
 python ensemble_result.py DUDE PCBA DEKOIS
