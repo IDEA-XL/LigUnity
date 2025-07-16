@@ -20,6 +20,10 @@ https://colab.research.google.com/drive/1gf0HhgyqI4qBjUAUICCvDa-FnTaARmR_?usp=sh
 
 Please feel free to contact me by email if there is any problem with the code or paper: fengbin@idea.edu.cn.
 
+### Resource availability
+
+The datasets for LigUnity were collected from ChEMBL version 34 and BindingDB version 2024m5. Our training dataset is available on figshare (https://doi.org/10.6084/m9.figshare.27966819). Our PocketAffDB with protein and pocket PDB structures is available on figshare (https://doi.org/10.6084/m9.figshare.29379161). 
+
 ## Abstract
 
 Protein-ligand binding affinity plays an important role in drug discovery, especially during virtual screening and hit-to-lead optimization. Computational chemistry and machine learning methods have been developed to investigate these tasks. Despite the encouraging performance, virtual screening and hit-to-lead optimization are often studied separately by existing methods, partially because they are performed sequentially in the existing drug discovery pipeline, thereby overlooking their interdependency and complementarity. To address this problem, we propose LigUnity, a foundation model for protein-ligand binding prediction by jointly optimizing virtual screening and hit-to-lead optimization. 
