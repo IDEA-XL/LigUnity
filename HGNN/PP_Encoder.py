@@ -7,7 +7,7 @@ import copy
 
 class PPEncoder(nn.Module):
 
-    def __init__(self, pocket_encoder, embed_dim, pocket_graph, aggregator, assayid_lst_all, assayid_lst_train, base_model=None, cuda="cpu"):
+    def __init__(self, pocket_encoder, embed_dim, pocket_graph=None, aggregator=None, assayid_lst_all=[], assayid_lst_train=[], base_model=None, cuda="cpu"):
         super(PPEncoder, self).__init__()
 
         self.pocket_encoder = pocket_encoder
@@ -41,7 +41,11 @@ class PPEncoder(nn.Module):
             to_neighs.append(neighbors)
 
         neigh_feats = self.aggregator.forward(nodes_pocket, to_neighs)  # user-user network
-
         self_feats = self.pocket_encoder(nodes_pocket, nodes_lig, max_sample)
 
+        return (self_feats + neigh_feats) / 2
+    
+    def refine_pocket(self, pocket_embed, neighbor_list=None):
+        neigh_feats = self.aggregator.forward_inference(pocket_embed, neighbor_list)
+        self_feats = self.pocket_encoder.refine_pocket(pocket_embed, neighbor_list)
         return (self_feats + neigh_feats) / 2

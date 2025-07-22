@@ -6,7 +6,7 @@ import random
 
 class PLEncoder(nn.Module):
 
-    def __init__(self, embed_dim, pocket_graph, aggregator, idx2assayid, assayid_lst_train, mol_smi, train_label_lst, cuda="cpu", uv=True):
+    def __init__(self, embed_dim, pocket_graph=None, aggregator=None, idx2assayid={}, assayid_lst_train=[], mol_smi={}, train_label_lst=[], cuda="cpu", uv=True):
         super(PLEncoder, self).__init__()
 
         self.uv = uv
@@ -16,6 +16,7 @@ class PLEncoder(nn.Module):
         self.device = cuda
         smi2idx = {smi:idx for idx, smi in enumerate(mol_smi)}
         self.idx2assayid, self.assayid_lst_train, self.smi2idx, self.mol_smi, self.train_label_lst = idx2assayid, assayid_lst_train, smi2idx, mol_smi, train_label_lst
+        self.assayid_set_train = set(assayid_lst_train)
         self.label_dicts = {x["assay_id"]: x for x in self.train_label_lst}
         self.linear1 = nn.Linear(2 * self.embed_dim, self.embed_dim)  #
 
@@ -38,10 +39,13 @@ class PLEncoder(nn.Module):
                     continue
                 if smi == nbr_smi:
                     continue
-                if n_assayid not in self.assayid_lst_train:
+                if n_assayid not in self.assayid_set_train:
                     continue
                 neighbors.append((self.smi2idx[nbr_smi], int((score - 0.5) * 10)))
             to_neighs.append(neighbors)
 
         neigh_feats = self.aggregator.forward(nodes_pocket, to_neighs)  # user-item network
         return neigh_feats
+    
+    def refine_pocket(self, pocket_embed, neighbor_list=None):
+        return self.aggregator.forward_inference(pocket_embed, neighbor_list)

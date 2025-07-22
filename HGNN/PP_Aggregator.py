@@ -11,7 +11,7 @@ class PPAggregator(nn.Module):
     Social Aggregator: for aggregating embeddings of social neighbors.
     """
 
-    def __init__(self, u2e, embed_dim, cuda="cpu"):
+    def __init__(self, u2e=None, embed_dim=128, cuda="cpu"):
         super(PPAggregator, self).__init__()
         self.device = cuda
         self.u2e = u2e
@@ -35,3 +35,9 @@ class PPAggregator(nn.Module):
             else:
                 embed_matrix[i] = self_feats[i]
         return embed_matrix
+    
+    def forward_inference(self, pocket_embed, neighbor_list):
+        neighbor_embed = torch.stack([x[0] for x in neighbor_list])
+        att_w = self.att(neighbor_embed, pocket_embed, len(neighbor_list))
+        att_res = torch.mm(neighbor_embed.t(), att_w).t()
+        return (att_res + pocket_embed) / 2
