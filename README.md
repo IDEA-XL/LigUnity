@@ -8,12 +8,18 @@ This repository contains the code for **LigUnity**: **A foundation model for pro
 
 ## Instruction on running our model
 
-### Direct inference
+### Virtual Screening
+Colab demo for virtual screening with given protein pocket and candidate ligands.
+
+https://colab.research.google.com/drive/1F0QSPjkKKLAfBexmIQotcs-jm87ohHeG?usp=sharing
+
+### Hit-to-lead optimization 
+**Direct inference**
 Colab demo for code inference with given protein and unmeasured ligands.
 
 https://colab.research.google.com/drive/11Fx6mO51rRkPvq71qupuUmscfBw8Dw5R?usp=sharing
 
-### Few-shot fine-tuning
+**Few-shot fine-tuning**
 Colab demo for few-shot fine-tuning with given protein, few measure ligands for fine-tuning and unmeasured ligands for testing.
 
 https://colab.research.google.com/drive/1gf0HhgyqI4qBjUAUICCvDa-FnTaARmR_?usp=sharing
