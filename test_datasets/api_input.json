@@ -1,0 +1,7 @@
+{
+    "uniprot": "P56817",
+    "protein_pdb": "./test_datasets/FEP/structures/bace_protein.pdb",
+    "ref_ligand": "./test_datasets/FEP/structures/bace.mol2",
+    "query_ligands": "./test_datasets/bace_query.json",
+    "output_dir": "./test_output"
+}
