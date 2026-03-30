@@ -234,6 +234,7 @@ def main():
     parser.add_argument("--test_ckpt", type=str, default=None)
     parser.add_argument("--data_root", type=str, default="../data")
     parser.add_argument("--result_root", type=str, default="../result/pocket_ranking")
+    parser.add_argument("--similarity_thres", type=float, default=1.0)
     args = parser.parse_args()
     data_root = args.data_root
 
@@ -250,7 +251,7 @@ def main():
 
     print("begin load dataset")
     assayinfo_lst, pocket_feat, mol_feat, assayid_lst_all, mol_smi_lst, \
-        assayid_lst_train, assayid_lst_test, dude_pocket_name, pcba_pocket_name, dekois_pocket_name, valid_molidxes = load_datas(data_root, result_root)
+        assayid_lst_train, assayid_lst_test, dude_pocket_name, pcba_pocket_name, dekois_pocket_name, valid_molidxes = load_datas(data_root, args.result_root, args.similarity_thres)
     print("begin load pocket-pocket graph")
     pocket_graph = load_pocket_pocket_graph(data_root, assayid_lst_all, assayid_lst_train)
 

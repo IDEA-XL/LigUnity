@@ -119,7 +119,28 @@ def read_cluster_file(cluster_file):
                 line_in_clstr.append(line.split('|')[1])
     return protein_clstr_dict
 
-def load_assayinfo(data_root, result_root):
+
+def read_distance_file(distance_file, threshold=0.7):
+    protein_clstr_dict = {}
+    with open(distance_file) as f:
+        line_in_clstr = []
+        for line in f.readlines():
+            line = line.strip().split('\t')
+            a = line[0].split('|')[1]
+            b = line[1].split('|')[1]
+            dist = float(line[2])
+            if dist > threshold:
+                continue
+            if a not in protein_clstr_dict.keys():
+                protein_clstr_dict[a] = [a]
+            if b not in protein_clstr_dict.keys():
+                protein_clstr_dict[b] = [b]
+            protein_clstr_dict[a].append(b)
+            protein_clstr_dict[b].append(a)
+    return protein_clstr_dict
+
+
+def load_assayinfo(data_root, result_root, similarity_thres=1.0):
     labels = json.load(open(f"{data_root}/train_label_pdbbind_seq.json")) + \
              json.load(open("../test_datasets/casf_label_seq.json"))
     save_dir_bdb = f"{result_root}/BDB"
@@ -137,10 +158,15 @@ def load_assayinfo(data_root, result_root):
     non_repeat_uniprot += [x[0] for x in json.load(open(f"{testset_uniport_root}/PCBA.json"))]
     non_repeat_uniprot += [x[0] for x in json.load(open(f"{testset_uniport_root}/dekois.json"))]
     non_repeat_uniprot_strict = []
-    protein_clstr_dict_40 = read_cluster_file(f"{data_root}/uniport40.clstr")
-    protein_clstr_dict_80 = read_cluster_file(f"{data_root}/uniport80.clstr")
+    protein_clstr_dict = {}
+    if similarity_thres == 0.8:
+        protein_clstr_dict = read_cluster_file(f"{data_root}/uniport80.clstr")
+    elif similarity_thres == 0.4:
+        protein_clstr_dict = read_cluster_file(f"{data_root}/uniport40.clstr")
+    elif similarity_thres == 0.3:
+        protein_clstr_dict = read_distance_file(f"{data_root}/sequence_distance.txt")
     for uniprot in non_repeat_uniprot:
-        non_repeat_uniprot_strict += protein_clstr_dict_80.get(uniprot, [])
+        non_repeat_uniprot_strict += protein_clstr_dict.get(uniprot, [])
         non_repeat_uniprot_strict.append(uniprot)
     old_len = len(labels_bdb)
     non_repeat_assayids = json.load(open(os.path.join(data_root, "fep_assays.json")))
@@ -162,7 +188,8 @@ def load_assayinfo(data_root, result_root):
     for label in labels:
         label["ligands"] = sorted(label["ligands"], key=lambda x: x["act"], reverse=True)
 
-    # labels = [x for x in labels if (x["uniprot"] not in non_repeat_uniprot_strict)]
+    if similarity_thres < 1.0:
+        labels = [x for x in labels if (x["uniprot"] not in non_repeat_uniprot_strict)]
     return labels
 
 def load_id_dict(result_root, assayinfo_lst):
@@ -213,8 +240,8 @@ def load_id_dict(result_root, assayinfo_lst):
     return train_pocket, test_pocket, pocket_feat_train, pocket_feat_test
 
 
-def load_datas(data_root, result_root):
-    assayinfo_lst = load_assayinfo(data_root, result_root)
+def load_datas(data_root, result_root, similarity_thres=1.0):
+    assayinfo_lst = load_assayinfo(data_root, result_root, similarity_thres)
     assayid_lst_train, assayid_lst_test, pocket_feat_train, pocket_feat_test = load_id_dict(result_root, assayinfo_lst)
 
     dude_pocket_feat, dude_pocket_name = load_pocket_dude(result_root)
