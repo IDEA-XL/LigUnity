@@ -126,6 +126,25 @@ def read_cluster_file(cluster_file):
                 line_in_clstr.append(line.split('|')[1])
     return protein_clstr_dict
 
+def read_distance_file(distance_file, threshold=0.7):
+    protein_clstr_dict = {}
+    with open(distance_file) as f:
+        line_in_clstr = []
+        for line in f.readlines():
+            line = line.strip().split('\t')
+            a = line[0].split('|')[1]
+            b = line[1].split('|')[1]
+            dist = float(line[2])
+            if dist > threshold:
+                continue
+            if a not in protein_clstr_dict.keys():
+                protein_clstr_dict[a] = [a]
+            if b not in protein_clstr_dict.keys():
+                protein_clstr_dict[b] = [b]
+            protein_clstr_dict[a].append(b)
+            protein_clstr_dict[b].append(a)
+    return protein_clstr_dict
+
 @register_task("train_task")
 class pocketscreen(UnicoreTask):
     """Task for training transformer auto-encoder models."""
@@ -491,6 +510,10 @@ class pocketscreen(UnicoreTask):
             protein_clstr_dict_80 = read_cluster_file(
                 f"{self.args.data}/uniport80.clstr")
             protein_clstr_dict = protein_clstr_dict_80
+        elif self.args.protein_similarity_thres == 0.3:
+            protein_clstr_dict_30 = read_distance_file(
+                f"{self.args.data}/sequence_distance.txt")
+            protein_clstr_dict = protein_clstr_dict_30
 
         if split == "train" or (split == "valid" and self.args.valid_set == "TIME"):
             mol_data_path = os.path.join(self.args.data, "train_lig_all_blend.lmdb")
